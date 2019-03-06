@@ -43,6 +43,9 @@ class GPXMapView: MKMapView {
     /// List of tracks currently displayed on the map.
     var tracks: [GPXTrack] = []
     
+    /// Use for handling two trackpoint locations at once to faciliate distance counting.
+    var locationCounter: [CLLocation] = []
+    
     /// Current track segments
     var trackSegments: [GPXTrackSegment] = []
     
@@ -186,7 +189,6 @@ class GPXMapView: MKMapView {
         headingImageView?.transform = CGAffineTransform(rotationAngle: rotation)
     }
     
-    
     ///
     /// Adds a new point to current segment.
     /// - Parameters:
@@ -195,20 +197,18 @@ class GPXMapView: MKMapView {
     func addPointToCurrentTrackSegmentAtLocation(_ location: CLLocation) {
         let pt = GPXTrackPoint(location: location)
         self.currentSegment.add(trackpoint: pt)
+        self.locationCounter.append(location)
         //redrawCurrent track segment overlay
         //First remove last overlay, then re-add the overlay updated with the new point
         self.removeOverlay(currentSegmentOverlay)
         currentSegmentOverlay = currentSegment.overlay
         self.addOverlay(currentSegmentOverlay)
         self.extent.extendAreaToIncludeLocation(location.coordinate)
-        
         //add the distance to previous tracked point
         if self.currentSegment.trackpoints.count >= 2 { //at elast there are two points in the segment
-            let prevPt = self.currentSegment.trackpoints[self.currentSegment.trackpoints.count-2] //get previous point
-            guard let latitude = prevPt.latitude, let longitude = prevPt.longitude else { return }
-            let prevPtLoc = CLLocation(latitude: latitude, longitude: longitude)
             //now get the distance
-            let distance = prevPtLoc.distance(from: location)
+            let distance = locationCounter[0].distance(from: locationCounter[1])
+            self.locationCounter.removeFirst()
             self.currentTrackDistance += distance
             self.totalTrackedDistance += distance
             self.currentSegmentDistance += distance
@@ -243,6 +243,7 @@ class GPXMapView: MKMapView {
         self.removeOverlays(self.overlays)
         self.removeAnnotations(self.annotations)
         self.extent = GPXExtentCoordinates()
+        self.locationCounter = []
         
         self.totalTrackedDistance = 0.00
         self.currentTrackDistance = 0.00
