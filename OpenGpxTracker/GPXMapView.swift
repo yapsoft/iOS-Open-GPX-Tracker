@@ -260,7 +260,7 @@ class GPXMapView: MKMapView {
     /// Converts current map into a GPX String
     ///
     ///
-    func exportToGPXString() -> String {
+    func exportToGPXString(isTracking: Bool) -> String {
         print("Exporting map data into GPX String")
         //Create the gpx structure
         let gpx = GPXRoot(creator: kGPXCreatorString)
@@ -270,6 +270,9 @@ class GPXMapView: MKMapView {
         //add current segment if not empty
         if self.currentSegment.trackpoints.count > 0 {
             track.add(trackSegment: self.currentSegment)
+        }
+        if isTracking {
+            self.tracks.removeLast()
         }
         self.tracks.append(track)
         gpx.add(tracks: self.tracks)
