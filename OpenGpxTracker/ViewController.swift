@@ -924,6 +924,9 @@ extension ViewController: UIAlertViewDelegate {
                 print("Save canceled")
                 
             case 1: //Save
+                if gpxTrackingStatus == .tracking {
+                    self.map.startNewTrackSegment()
+                }
                 let filename = (alertView.textField(at: 0)?.text!.utf16.count == 0) ? defaultFilename() : alertView.textField(at: 0)?.text
                 print("Save File \(String(describing: filename))")
                 //export to a file
