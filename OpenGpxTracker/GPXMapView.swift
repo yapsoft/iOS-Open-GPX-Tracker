@@ -272,7 +272,11 @@ class GPXMapView: MKMapView {
             track.add(trackSegment: self.currentSegment)
         }
         if isTracking && self.tracks.count > 1 {
-            self.tracks.removeLast()
+            if let tracksegment = self.tracks.last?.tracksegments.first {
+                if tracksegment.trackpoints[..<10] == self.currentSegment.trackpoints[..<10] {
+                    self.tracks.removeLast()
+                }
+            }
         }
         self.tracks.append(track)
         gpx.add(tracks: self.tracks)
