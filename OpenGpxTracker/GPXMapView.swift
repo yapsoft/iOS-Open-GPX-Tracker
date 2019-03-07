@@ -271,7 +271,7 @@ class GPXMapView: MKMapView {
         if self.currentSegment.trackpoints.count > 0 {
             track.add(trackSegment: self.currentSegment)
         }
-        if isTracking {
+        if isTracking && self.tracks.count > 1 {
             self.tracks.removeLast()
         }
         self.tracks.append(track)
