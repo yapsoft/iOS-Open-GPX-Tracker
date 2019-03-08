@@ -102,7 +102,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
     var lastGpxFilename: String = ""
     var wasSentToBackground: Bool = false //Was the app sent to background
     var isDisplayingLocationServicesDenied: Bool = false
-    var isTracking = false
     
     /// Has the map any waypoint?
     var hasWaypoints: Bool = false {
@@ -148,7 +147,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
                 
                 map.clearMap() //clear map
                 lastGpxFilename = "" //clear last filename, so when saving it appears an empty field
-                isTracking = false
                 totalTrackedDistanceLabel.distance = (map.totalTrackedDistance)
                 currentSegmentDistanceLabel.distance = (map.currentSegmentDistance)
                 
@@ -172,7 +170,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
                 resetButton.backgroundColor = kRedButtonBackgroundColor
                 // start clock
                 self.stopWatch.start()
-                isTracking = true
                 
             case .paused:
                 print("switched to paused mode")
@@ -182,7 +179,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
                 // activate save & reset (just in case switched from .NotStarted)
                 saveButton.backgroundColor = kBlueButtonBackgroundColor
                 resetButton.backgroundColor = kRedButtonBackgroundColor
-                isTracking = false
                 //pause clock
                 self.stopWatch.stop()
                 // start new track segment
@@ -722,7 +718,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
         print("share")
         //Create a temporary file
         let filename =  lastGpxFilename.isEmpty ? defaultFilename() : lastGpxFilename
-        let gpxString: String = self.map.exportToGPXString(isTracking: isTracking)
+        let gpxString: String = self.map.exportToGPXString()
         let tmpFile = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(filename).gpx")
         GPXFileManager.saveToURL(tmpFile, gpxContents: gpxString)
         //Add it to the list of tmpFiles.
@@ -930,7 +926,7 @@ extension ViewController: UIAlertViewDelegate {
                 let filename = (alertView.textField(at: 0)?.text!.utf16.count == 0) ? defaultFilename() : alertView.textField(at: 0)?.text
                 print("Save File \(String(describing: filename))")
                 //export to a file
-                let gpxString = self.map.exportToGPXString(isTracking: isTracking)
+                let gpxString = self.map.exportToGPXString()
                 GPXFileManager.save(filename!, gpxContents: gpxString)
                 self.lastGpxFilename = filename!
                 
