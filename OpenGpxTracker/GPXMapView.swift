@@ -271,7 +271,7 @@ class GPXMapView: MKMapView {
         if self.currentSegment.trackpoints.count > 0 {
             track.add(trackSegment: self.currentSegment)
         }
-
+        /*
         if isTracking && self.tracks.count > 1 {
             if let tracksegment = self.tracks.last?.tracksegments.first {
                 if tracksegment.trackpoints.count > 0 && currentSegment.trackpoints.count > 0 {
@@ -281,7 +281,26 @@ class GPXMapView: MKMapView {
                 }
             }
         }
-        
+        */
+        if let lastTrack = tracks.last {
+            if lastTrack.tracksegments.contains(self.currentSegment) {
+                self.tracks.removeLast()
+            }
+            else {
+                for trackSegment in self.trackSegments {
+                    if lastTrack.tracksegments.contains(trackSegment) {
+                        self.tracks.removeLast()
+                        break
+                    }
+                }
+            }
+        }
+        // testing purposes
+        print("segments: \(trackSegments)")
+        print("currentSegment: \(currentSegment)")
+        print("track: \(track)")
+        print("Lasttrackseg: \(tracks.last?.tracksegments)")
+        print("LastTrack: \(tracks.last)")
         self.tracks.append(track)
         gpx.add(tracks: self.tracks)
         return gpx.gpx()
