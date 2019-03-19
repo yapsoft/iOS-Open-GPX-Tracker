@@ -133,6 +133,11 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIAlertViewDelegate {
                             }, completion: { (finished: Bool) -> Void in
                                 UIView.animate(withDuration: 0.1, animations: { () -> Void in
                                     annotationView.transform = CGAffineTransform.identity
+                                    // Haptic Feedback after pin drops
+                                    if #available(iOS 10.0, *) {
+                                        // when the pin drops, some impact should be felt :)
+                                        UIImpactFeedbackGenerator().impactOccurred()
+                                    }
                                 })
                         })
                     }
