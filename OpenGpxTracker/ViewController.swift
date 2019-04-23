@@ -57,12 +57,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
         didSet {
             if followUser {
                 print("followUser=true")
-                followUserButton.setImage(UIImage(named: "follow_user_high"), for: UIControl.State())
+                interactableLayer.followUserButton.setImage(UIImage(named: "follow_user_high"), for: UIControl.State())
                 map.setCenter((map.userLocation.coordinate), animated: true)
                 
             } else {
                 print("followUser=false")
-               followUserButton.setImage(UIImage(named: "follow_user"), for: UIControl.State())
+                interactableLayer.followUserButton.setImage(UIImage(named: "follow_user"), for: UIControl.State())
             }
             
         }
@@ -103,8 +103,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
         /// Whenever it is updated, if it has waypoints it sets the save and reset button
         didSet {
             if hasWaypoints {
-                saveButton.backgroundColor = kBlueButtonBackgroundColor
-                resetButton.backgroundColor = kRedButtonBackgroundColor
+                interactableLayer.saveButton.backgroundColor = kBlueButtonBackgroundColor
+                interactableLayer.resetButton.backgroundColor = kRedButtonBackgroundColor
             }
         }
     }
@@ -131,20 +131,20 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
             case .notStarted:
                 print("switched to non started")
                 // set Tracker button to allow Start 
-                trackerButton.setTitle("Start Tracking", for: UIControl.State())
-                trackerButton.backgroundColor = kGreenButtonBackgroundColor
+                interactableLayer.trackerButton.setTitle("Start Tracking", for: UIControl.State())
+                interactableLayer.trackerButton.backgroundColor = kGreenButtonBackgroundColor
                 //save & reset button to transparent.
-                saveButton.backgroundColor = kDisabledBlueButtonBackgroundColor
-                resetButton.backgroundColor = kDisabledRedButtonBackgroundColor
+                interactableLayer.saveButton.backgroundColor = kDisabledBlueButtonBackgroundColor
+                interactableLayer.resetButton.backgroundColor = kDisabledRedButtonBackgroundColor
                 //reset clock
                 stopWatch.reset()
-                timeLabel.text = stopWatch.elapsedTimeString
+                interactableLayer.timeLabel.text = stopWatch.elapsedTimeString
                 
                 map.clearMap() //clear map
                 lastGpxFilename = "" //clear last filename, so when saving it appears an empty field
                 
-                totalTrackedDistanceLabel.distance = (map.totalTrackedDistance)
-                currentSegmentDistanceLabel.distance = (map.currentSegmentDistance)
+                interactableLayer.totalTrackedDistanceLabel.distance = (map.totalTrackedDistance)
+                interactableLayer.currentSegmentDistanceLabel.distance = (map.currentSegmentDistance)
                 
                 /*
                 // XXX Left here for reference
@@ -159,22 +159,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
             case .tracking:
                 print("switched to tracking mode")
                 // set tracerkButton to allow Pause
-                trackerButton.setTitle("Pause", for: UIControl.State())
-                trackerButton.backgroundColor = kPurpleButtonBackgroundColor
+                interactableLayer.trackerButton.setTitle("Pause", for: UIControl.State())
+                interactableLayer.trackerButton.backgroundColor = kPurpleButtonBackgroundColor
                 //activate save & reset buttons
-                saveButton.backgroundColor = kBlueButtonBackgroundColor
-                resetButton.backgroundColor = kRedButtonBackgroundColor
+                interactableLayer.saveButton.backgroundColor = kBlueButtonBackgroundColor
+                interactableLayer.resetButton.backgroundColor = kRedButtonBackgroundColor
                 // start clock
                 self.stopWatch.start()
                 
             case .paused:
                 print("switched to paused mode")
                 // set trackerButton to allow Resume
-                self.trackerButton.setTitle("Resume", for: UIControl.State())
-                self.trackerButton.backgroundColor = kGreenButtonBackgroundColor
+                interactableLayer.trackerButton.setTitle("Resume", for: UIControl.State())
+                interactableLayer.trackerButton.backgroundColor = kGreenButtonBackgroundColor
                 // activate save & reset (just in case switched from .NotStarted)
-                saveButton.backgroundColor = kBlueButtonBackgroundColor
-                resetButton.backgroundColor = kRedButtonBackgroundColor
+                interactableLayer.saveButton.backgroundColor = kBlueButtonBackgroundColor
+                interactableLayer.resetButton.backgroundColor = kRedButtonBackgroundColor
                 //pause clock
                 self.stopWatch.stop()
                 // start new track segment
@@ -186,7 +186,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
     /// Editing Waypoint Temporal Reference
     var lastLocation: CLLocation? //Last point of current segment.
     
-    
+    /*
     //UI
     //labels
     var appTitleLabel: UILabel
@@ -210,7 +210,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
     var resetButton: UIButton
     var trackerButton: UIButton
     var saveButton: UIButton
-    
+    */
     // Signal accuracy images
     let signalImage0 = UIImage(named: "signal0")
     let signalImage1 = UIImage(named: "signal1")
@@ -220,10 +220,15 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
     let signalImage5 = UIImage(named: "signal5")
     let signalImage6 = UIImage(named: "signal6")
  
+    
+    var interactableLayer: UIInteractableLayer
+    var headerLayer: UIHeaderLayer
+ 
     // Initializer. Just initializes the class vars/const
     required init(coder aDecoder: NSCoder) {
         self.map = GPXMapView(coder: aDecoder)!
         
+        /*
         self.appTitleLabel = UILabel(coder: aDecoder)!
         self.signalImageView = UIImageView(coder: aDecoder)!
         self.signalAccuracyLabel = UILabel(coder: aDecoder)!
@@ -244,6 +249,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
         
         self.trackerButton = UIButton(coder: aDecoder)!
         self.saveButton = UIButton(coder: aDecoder)!
+        */
+        self.interactableLayer = UIInteractableLayer(coder: aDecoder)!
+        self.headerLayer = UIHeaderLayer(coder: aDecoder)!
         
         super.init(coder: aDecoder)!
         followUser = true
@@ -369,237 +377,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
         self.view.addSubview(map)
         
         addNotificationObservers()
+
+        self.view.addSubview(headerLayer)
+        headerLayer.setupLayer(with: map, view: view, isIPhoneX: isIPhoneX)
         
-        //
-        // ---------------------- Build Interface Area -----------------------------
-        //
-        // HEADER
-        let font36 = UIFont(name: "DinCondensed-Bold", size: 36.0)
-        let font18 = UIFont(name: "DinAlternate-Bold", size: 18.0)
-        let font12 = UIFont(name: "DinAlternate-Bold", size: 12.0)
-        
-        //add the app title Label (Branding, branding, branding! )
-        let appTitleW: CGFloat = self.view.frame.width//200.0
-        let appTitleH: CGFloat = 14.0
-        let appTitleX: CGFloat = 0 //self.view.frame.width/2 - appTitleW/2
-        let appTitleY: CGFloat = isIPhoneX ? 40.0 : 20.0
-        appTitleLabel.frame = CGRect(x:appTitleX, y: appTitleY, width: appTitleW, height: appTitleH)
-        appTitleLabel.text = "  Open GPX Tracker"
-        appTitleLabel.textAlignment = .left
-        appTitleLabel.font = UIFont.boldSystemFont(ofSize: 10)
-        //appTitleLabel.textColor = UIColor(red: 0.0/255.0, green: 0.0/255.0, blue: 0.0/255.0, alpha: 1.0)
-        appTitleLabel.textColor = UIColor.yellow
-        appTitleLabel.backgroundColor = UIColor(red: 58.0/255.0, green: 57.0/255.0, blue: 54.0/255.0, alpha: 0.80)
-        appTitleLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
-        self.view.addSubview(appTitleLabel)
-        
-        // CoordLabel
-        coordsLabel.frame = CGRect(x: self.map.frame.width - 305, y: appTitleY, width: 300, height: 12)
-        coordsLabel.textAlignment = .right
-        coordsLabel.font = font12
-        coordsLabel.textColor = UIColor.white
-        coordsLabel.text = kNotGettingLocationText
-        coordsLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
-        self.view.addSubview(coordsLabel)
-        
-        // Tracked info
-        let iPhoneXdiff: CGFloat  = isIPhoneX ? 40 : 0
-        //timeLabel
-        timeLabel.frame = CGRect(x: self.map.frame.width - 160, y: 20 + iPhoneXdiff, width: 150, height: 40)
-        timeLabel.textAlignment = .right
-        timeLabel.font = font36
-        timeLabel.text = "00:00"
-        timeLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
-        //timeLabel.shadowColor = UIColor.whiteColor()
-        //timeLabel.shadowOffset = CGSize(width: 1, height: 1)
-        //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
-        map.addSubview(timeLabel)
-        
-        //speed Label
-        speedLabel.frame = CGRect(x: self.map.frame.width - 160,  y: 20 + 36 + iPhoneXdiff, width: 150, height: 20)
-        speedLabel.textAlignment = .right
-        speedLabel.font = font18
-        speedLabel.text = "0.00 km/h"
-        speedLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
-        //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
-        map.addSubview(speedLabel)
-        
-        //tracked distance
-        totalTrackedDistanceLabel.frame = CGRect(x: self.map.frame.width - 160, y: 60 + 20 + iPhoneXdiff, width: 150, height: 40)
-        totalTrackedDistanceLabel.textAlignment = .right
-        totalTrackedDistanceLabel.font = font36
-        totalTrackedDistanceLabel.text = "0m"
-        totalTrackedDistanceLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
-        //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
-        map.addSubview(totalTrackedDistanceLabel)
-        
-        currentSegmentDistanceLabel.frame = CGRect(x: self.map.frame.width - 160, y: 80 + 36 + iPhoneXdiff, width: 150, height: 20)
-        currentSegmentDistanceLabel.textAlignment = .right
-        currentSegmentDistanceLabel.font = font18
-        currentSegmentDistanceLabel.text = "0m"
-        currentSegmentDistanceLabel.autoresizingMask = [.flexibleWidth, .flexibleLeftMargin, .flexibleRightMargin]
-        //timeLabel.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
-        map.addSubview(currentSegmentDistanceLabel)
-        
-        //about button
-        aboutButton.frame = CGRect(x: 5 + 8, y: 14 + 5 + 48 + 5 + iPhoneXdiff, width: 32, height: 32)
-        aboutButton.setImage(UIImage(named: "info"), for: UIControl.State())
-        aboutButton.setImage(UIImage(named: "info_high"), for: .highlighted)
-        aboutButton.addTarget(self, action: #selector(ViewController.openAboutViewController), for: .touchUpInside)
-        aboutButton.autoresizingMask = [.flexibleRightMargin]
-        //aboutButton.backgroundColor = kWhiteBackgroundColor
-        //aboutButton.layer.cornerRadius = 24
-        map.addSubview(aboutButton)
-        
-        // Preferences button
-        preferencesButton.frame = CGRect(x: 5 + 10 + 48, y: 14 + 5 + 8  + iPhoneXdiff, width: 32, height: 32)
-        preferencesButton.setImage(UIImage(named: "prefs"), for: UIControl.State())
-        preferencesButton.setImage(UIImage(named: "prefs_high"), for: .highlighted)
-        preferencesButton.addTarget(self, action: #selector(ViewController.openPreferencesTableViewController), for: .touchUpInside)
-        preferencesButton.autoresizingMask = [.flexibleRightMargin]
-        //aboutButton.backgroundColor = kWhiteBackgroundColor
-        //aboutButton.layer.cornerRadius = 24
-        map.addSubview(preferencesButton)
-        
-        // Share button
-        shareButton.frame = CGRect(x: 5 + 10 + 48 * 2, y: 14 + 5 + 8  + iPhoneXdiff, width: 32, height: 32)
-        shareButton.setImage(UIImage(named: "share"), for: UIControl.State())
-        shareButton.setImage(UIImage(named: "share_high"), for: .highlighted)
-        shareButton.addTarget(self, action: #selector(ViewController.openShare), for: .touchUpInside)
-        shareButton.autoresizingMask = [.flexibleRightMargin]
-        //aboutButton.backgroundColor = kWhiteBackgroundColor
-        //aboutButton.layer.cornerRadius = 24
-        map.addSubview(shareButton)
-        
-        // Folder button
-        let folderW: CGFloat = kButtonSmallSize
-        let folderH: CGFloat = kButtonSmallSize
-        let folderX: CGFloat = folderW/2 + 5
-        let folderY: CGFloat = folderH/2 + 5 + 14  + iPhoneXdiff
-        folderButton.frame = CGRect(x: 0, y: 0, width: folderW, height: folderH)
-        folderButton.center = CGPoint(x: folderX, y: folderY)
-        folderButton.setImage(UIImage(named: "folder"), for: UIControl.State())
-        folderButton.setImage(UIImage(named: "folderHigh"), for: .highlighted)
-        folderButton.addTarget(self, action: #selector(ViewController.openFolderViewController), for: .touchUpInside)
-        folderButton.backgroundColor = kWhiteBackgroundColor
-        folderButton.layer.cornerRadius = 24
-        folderButton.autoresizingMask = [.flexibleRightMargin]
-        map.addSubview(folderButton)
-        
-        // Add signal accuracy images and labels
-        signalImageView.image = signalImage0
-        signalImageView.frame = CGRect(x: self.view.frame.width/2 - 25.0, y:  14 + 5 + iPhoneXdiff, width: 50, height: 30)
-        signalImageView.autoresizingMask  = [.flexibleLeftMargin, .flexibleRightMargin]
-        map.addSubview(signalImageView)
-        signalAccuracyLabel.frame = CGRect(x: self.view.frame.width/2 - 25.0, y:  14 + 5 + 30 + iPhoneXdiff , width: 50, height: 12)
-        signalAccuracyLabel.font = font12
-        signalAccuracyLabel.text = kUnknownAccuracyText
-        signalAccuracyLabel.textAlignment = .center
-        signalAccuracyLabel.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin]
-        map.addSubview(signalAccuracyLabel)
-        
-        
-        //
-        // Button Bar
-        //
-        // [ Small ] [ Small ] [ Large     ] [Small] [ Small]
-        //                     [ (tracker) ]
-        //
-        //                     [ track     ]
-        // [ follow] [ +Pin  ] [ Pause     ] [ Save ] [ Reset]
-        //                     [ Resume    ]
-        //
-        //                       trackerX
-        //                         |
-        //                         |
-        // [-----------------------|--------------------------]
-        //                  map.frame/2 (center)
-        
-        let yCenterForButtons: CGFloat = map.frame.height - kButtonLargeSize/2 - 5 //center Y of start
-        
-        
-        // Start/Pause button
-        let trackerW: CGFloat = kButtonLargeSize
-        let trackerH: CGFloat = kButtonLargeSize
-        let trackerX: CGFloat = self.map.frame.width/2 - 0.0 // Center of start
-        let trackerY: CGFloat = yCenterForButtons
-        trackerButton.frame = CGRect(x: 0, y:0, width: trackerW, height: trackerH)
-        trackerButton.center = CGPoint(x: trackerX, y: trackerY)
-        trackerButton.layer.cornerRadius = trackerW/2
-        trackerButton.setTitle("Start Tracking", for: UIControl.State())
-        trackerButton.backgroundColor = kGreenButtonBackgroundColor
-        trackerButton.addTarget(self, action: #selector(ViewController.trackerButtonTapped), for: .touchUpInside)
-        trackerButton.isHidden = false
-        trackerButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
-        trackerButton.titleLabel?.numberOfLines = 2
-        trackerButton.titleLabel?.textAlignment = .center
-        trackerButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
-        map.addSubview(trackerButton)
-        
-        // Pin Button (on the left of start)
-        let newPinW: CGFloat = kButtonSmallSize
-        let newPinH: CGFloat = kButtonSmallSize
-        let newPinX: CGFloat = trackerX - trackerW/2 - kButtonSeparation - newPinW/2
-        let newPinY: CGFloat = yCenterForButtons
-        newPinButton.frame = CGRect(x: 0, y: 0, width: newPinW, height: newPinH)
-        newPinButton.center = CGPoint(x: newPinX, y: newPinY)
-        newPinButton.layer.cornerRadius = newPinW/2
-        newPinButton.backgroundColor = kWhiteBackgroundColor
-        newPinButton.setImage(UIImage(named: "addPin"), for: UIControl.State())
-        newPinButton.setImage(UIImage(named: "addPinHigh"), for: .highlighted)
-        newPinButton.addTarget(self, action: #selector(ViewController.addPinAtMyLocation), for: .touchUpInside)
-        newPinButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
-        //let newPinLongPress = UILongPressGestureRecognizer(target: self, action: Selector("newPinLongPress:"))
-        //newPinButton.addGestureRecognizer(newPinLongPress)
-        map.addSubview(newPinButton)
-        
-        // Follow user button
-        let followW: CGFloat = kButtonSmallSize
-        let followH: CGFloat = kButtonSmallSize
-        let followX: CGFloat = newPinX - newPinW/2 - kButtonSeparation - followW/2
-        let followY: CGFloat = yCenterForButtons
-        followUserButton.frame = CGRect(x: 0, y: 0, width: followW, height: followH)
-        followUserButton.center = CGPoint(x: followX, y: followY)
-        followUserButton.layer.cornerRadius = followW/2
-        followUserButton.backgroundColor = kWhiteBackgroundColor
-        //follow_user_high represents the user is being followed. Default status when app starts
-        followUserButton.setImage(UIImage(named: "follow_user_high"), for: UIControl.State())
-        followUserButton.setImage(UIImage(named: "follow_user_high"), for: .highlighted)
-        followUserButton.addTarget(self, action: #selector(ViewController.followButtonTroggler), for: .touchUpInside)
-        followUserButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
-        map.addSubview(followUserButton)
-        
-        // Save button
-        let saveW: CGFloat = kButtonSmallSize
-        let saveH: CGFloat = kButtonSmallSize
-        let saveX: CGFloat = trackerX + trackerW/2 + kButtonSeparation + saveW/2
-        let saveY: CGFloat = yCenterForButtons
-        saveButton.frame = CGRect(x: 0, y: 0, width: saveW, height: saveH)
-        saveButton.center = CGPoint(x: saveX, y: saveY)
-        saveButton.layer.cornerRadius = saveW/2
-        saveButton.setTitle("Save", for: UIControl.State())
-        saveButton.backgroundColor = kDisabledBlueButtonBackgroundColor
-        saveButton.addTarget(self, action: #selector(ViewController.saveButtonTapped), for: .touchUpInside)
-        saveButton.isHidden = false
-        saveButton.titleLabel?.textAlignment = .center
-        saveButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
-        map.addSubview(saveButton)
-        
-        // Reset button
-        let resetW: CGFloat = kButtonSmallSize
-        let resetH: CGFloat = kButtonSmallSize
-        let resetX: CGFloat = saveX + saveW/2 + kButtonSeparation + resetW/2
-        let resetY: CGFloat = yCenterForButtons
-        resetButton.frame = CGRect(x: 0, y: 0, width: resetW, height: resetH)
-        resetButton.center = CGPoint(x: resetX, y: resetY)
-        resetButton.layer.cornerRadius = resetW/2
-        resetButton.setTitle("Reset", for: UIControl.State())
-        resetButton.backgroundColor = kDisabledRedButtonBackgroundColor
-        resetButton.addTarget(self, action: #selector(ViewController.resetButtonTapped), for: .touchUpInside)
-        resetButton.isHidden = false
-        resetButton.titleLabel?.textAlignment = .center
-        resetButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
-        map.addSubview(resetButton)
+        map.addSubview(interactableLayer)
+        interactableLayer.setupLayer(with: map, view: view, isIPhoneX: isIPhoneX)
     }
     
     ///
@@ -722,8 +505,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
         
         //Call Share activity View controller
         let activityViewController = UIActivityViewController(activityItems: [tmpFile], applicationActivities: nil)
-        activityViewController.popoverPresentationController?.sourceView = shareButton
-        activityViewController.popoverPresentationController?.sourceRect = shareButton.bounds
+        activityViewController.popoverPresentationController?.sourceView = interactableLayer.shareButton
+        activityViewController.popoverPresentationController?.sourceRect = interactableLayer.shareButton.bounds
         self.present(activityViewController, animated: true, completion: nil)
     
     }
@@ -943,7 +726,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
 ///
 extension ViewController: StopWatchDelegate {
     func stopWatch(_ stropWatch: StopWatch, didUpdateElapsedTimeString elapsedTimeString: String) {
-        timeLabel.text = elapsedTimeString
+        interactableLayer.timeLabel.text = elapsedTimeString
     }
 }
 
@@ -997,7 +780,7 @@ extension ViewController: GPXFilesTableViewControllerDelegate {
         self.map.regionToGPXExtent()
         self.gpxTrackingStatus = .paused
         
-        self.totalTrackedDistanceLabel.distance = self.map.totalTrackedDistance
+        interactableLayer.totalTrackedDistanceLabel.distance = self.map.totalTrackedDistance
         
     }
 }
@@ -1009,9 +792,9 @@ extension ViewController: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("didFailWithError \(error)")
-        coordsLabel.text = kNotGettingLocationText
-        signalAccuracyLabel.text = kUnknownAccuracyText
-        signalImageView.image = signalImage0
+        headerLayer.coordsLabel.text = kNotGettingLocationText
+        interactableLayer.signalAccuracyLabel.text = kUnknownAccuracyText
+        interactableLayer.signalImageView.image = signalImage0
         let locationError = error as? CLError
         switch locationError?.code {
         case CLError.locationUnknown:
@@ -1037,28 +820,28 @@ extension ViewController: CLLocationManagerDelegate {
         print("isUserLocationVisible: \(map.isUserLocationVisible) showUserLocation: \(map.showsUserLocation)")
         print("didUpdateLocation: received \(newLocation.coordinate) hAcc: \(newLocation.horizontalAccuracy) vAcc: \(newLocation.verticalAccuracy) floor: \(newLocation.floor?.description ?? "''") map.userTrackingMode: \(map.userTrackingMode.rawValue)")
         let hAcc = newLocation.horizontalAccuracy
-        signalAccuracyLabel.text = "±\(hAcc)m"
+        interactableLayer.signalAccuracyLabel.text = "±\(hAcc)m"
         if hAcc < kSignalAccuracy6 {
-            self.signalImageView.image = signalImage6
+            interactableLayer.signalImageView.image = signalImage6
         } else if hAcc < kSignalAccuracy5 {
-            self.signalImageView.image = signalImage5
+            interactableLayer.signalImageView.image = signalImage5
         } else if hAcc < kSignalAccuracy4 {
-            self.signalImageView.image = signalImage4
+            interactableLayer.signalImageView.image = signalImage4
         } else if hAcc < kSignalAccuracy3 {
-            self.signalImageView.image = signalImage3
+            interactableLayer.signalImageView.image = signalImage3
         } else if hAcc < kSignalAccuracy2 {
-            self.signalImageView.image = signalImage2
+            interactableLayer.signalImageView.image = signalImage2
         } else if hAcc < kSignalAccuracy1 {
-            self.signalImageView.image = signalImage1
+            interactableLayer.signalImageView.image = signalImage1
         } else{
-            self.signalImageView.image = signalImage0
+            interactableLayer.signalImageView.image = signalImage0
         }
         
         //Update coordsLabel
         let latFormat = String(format: "%.6f", newLocation.coordinate.latitude)
         let lonFormat = String(format: "%.6f", newLocation.coordinate.longitude)
         let altFormat = String(format: "%.2f", newLocation.altitude)
-        coordsLabel.text = "(\(latFormat),\(lonFormat)) · altitude: \(altFormat)m"
+        headerLayer.coordsLabel.text = "(\(latFormat),\(lonFormat)) · altitude: \(altFormat)m"
         
         
         //Update speed (provided in m/s, but displayed in km/h)
@@ -1068,7 +851,7 @@ extension ViewController: CLLocationManagerDelegate {
         } else {
             speedFormat = String(format: "%.2f", (newLocation.speed * 3.6))
         }
-        speedLabel.text = "\(speedFormat) km/h"
+        interactableLayer.speedLabel.text = "\(speedFormat) km/h"
         
         //Update Map center and track overlay if user is being followed
         if followUser {
@@ -1077,8 +860,8 @@ extension ViewController: CLLocationManagerDelegate {
         if gpxTrackingStatus == .tracking {
             print("didUpdateLocation: adding point to track (\(newLocation.coordinate.latitude),\(newLocation.coordinate.longitude))")
             map.addPointToCurrentTrackSegmentAtLocation(newLocation)
-            totalTrackedDistanceLabel.distance = map.totalTrackedDistance
-            currentSegmentDistanceLabel.distance = map.currentSegmentDistance
+            interactableLayer.totalTrackedDistanceLabel.distance = map.totalTrackedDistance
+            interactableLayer.currentSegmentDistanceLabel.distance = map.currentSegmentDistance
         }
     }
     
