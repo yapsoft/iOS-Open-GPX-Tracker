@@ -141,7 +141,6 @@ class UIInteractableLayer: UIView {
         aboutButton.frame = CGRect(x: 5 + 8, y: 14 + 5 + 48 + 5 + iPhoneXdiff, width: 32, height: 32)
         aboutButton.setImage(UIImage(named: "info"), for: UIControl.State())
         aboutButton.setImage(UIImage(named: "info_high"), for: .highlighted)
-        aboutButton.addTarget(ViewController.self, action: #selector(ViewController.openAboutViewController), for: .touchUpInside)
         aboutButton.autoresizingMask = [.flexibleRightMargin]
         //aboutButton.backgroundColor = kWhiteBackgroundColor
         //aboutButton.layer.cornerRadius = 24
@@ -151,7 +150,6 @@ class UIInteractableLayer: UIView {
         preferencesButton.frame = CGRect(x: 5 + 10 + 48, y: 14 + 5 + 8  + iPhoneXdiff, width: 32, height: 32)
         preferencesButton.setImage(UIImage(named: "prefs"), for: UIControl.State())
         preferencesButton.setImage(UIImage(named: "prefs_high"), for: .highlighted)
-        preferencesButton.addTarget(ViewController.self, action: #selector(ViewController.openPreferencesTableViewController), for: .touchUpInside)
         preferencesButton.autoresizingMask = [.flexibleRightMargin]
         //aboutButton.backgroundColor = kWhiteBackgroundColor
         //aboutButton.layer.cornerRadius = 24
@@ -161,7 +159,6 @@ class UIInteractableLayer: UIView {
         shareButton.frame = CGRect(x: 5 + 10 + 48 * 2, y: 14 + 5 + 8  + iPhoneXdiff, width: 32, height: 32)
         shareButton.setImage(UIImage(named: "share"), for: UIControl.State())
         shareButton.setImage(UIImage(named: "share_high"), for: .highlighted)
-        shareButton.addTarget(ViewController.self, action: #selector(ViewController.openShare), for: .touchUpInside)
         shareButton.autoresizingMask = [.flexibleRightMargin]
         //aboutButton.backgroundColor = kWhiteBackgroundColor
         //aboutButton.layer.cornerRadius = 24
@@ -176,7 +173,6 @@ class UIInteractableLayer: UIView {
         folderButton.center = CGPoint(x: folderX, y: folderY)
         folderButton.setImage(UIImage(named: "folder"), for: UIControl.State())
         folderButton.setImage(UIImage(named: "folderHigh"), for: .highlighted)
-        folderButton.addTarget(ViewController.self, action: #selector(ViewController.openFolderViewController), for: .touchUpInside)
         folderButton.backgroundColor = kWhiteBackgroundColor
         folderButton.layer.cornerRadius = 24
         folderButton.autoresizingMask = [.flexibleRightMargin]
@@ -224,7 +220,6 @@ class UIInteractableLayer: UIView {
         trackerButton.layer.cornerRadius = trackerW/2
         trackerButton.setTitle("Start Tracking", for: UIControl.State())
         trackerButton.backgroundColor = kGreenButtonBackgroundColor
-        trackerButton.addTarget(ViewController.self, action: #selector(ViewController.trackerButtonTapped), for: .touchUpInside)
         trackerButton.isHidden = false
         trackerButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         trackerButton.titleLabel?.numberOfLines = 2
@@ -243,7 +238,6 @@ class UIInteractableLayer: UIView {
         newPinButton.backgroundColor = kWhiteBackgroundColor
         newPinButton.setImage(UIImage(named: "addPin"), for: UIControl.State())
         newPinButton.setImage(UIImage(named: "addPinHigh"), for: .highlighted)
-        newPinButton.addTarget(ViewController.self, action: #selector(ViewController.addPinAtMyLocation), for: .touchUpInside)
         newPinButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
         //let newPinLongPress = UILongPressGestureRecognizer(target: self, action: Selector("newPinLongPress:"))
         //newPinButton.addGestureRecognizer(newPinLongPress)
@@ -261,7 +255,6 @@ class UIInteractableLayer: UIView {
         //follow_user_high represents the user is being followed. Default status when app starts
         followUserButton.setImage(UIImage(named: "follow_user_high"), for: UIControl.State())
         followUserButton.setImage(UIImage(named: "follow_user_high"), for: .highlighted)
-        followUserButton.addTarget(ViewController.self, action: #selector(ViewController.followButtonTroggler), for: .touchUpInside)
         followUserButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
         self.addSubview(followUserButton)
         
@@ -275,7 +268,6 @@ class UIInteractableLayer: UIView {
         saveButton.layer.cornerRadius = saveW/2
         saveButton.setTitle("Save", for: UIControl.State())
         saveButton.backgroundColor = kDisabledBlueButtonBackgroundColor
-        saveButton.addTarget(ViewController.self, action: #selector(ViewController.saveButtonTapped), for: .touchUpInside)
         saveButton.isHidden = false
         saveButton.titleLabel?.textAlignment = .center
         saveButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
@@ -291,11 +283,23 @@ class UIInteractableLayer: UIView {
         resetButton.layer.cornerRadius = resetW/2
         resetButton.setTitle("Reset", for: UIControl.State())
         resetButton.backgroundColor = kDisabledRedButtonBackgroundColor
-        resetButton.addTarget(ViewController.self, action: #selector(ViewController.resetButtonTapped), for: .touchUpInside)
         resetButton.isHidden = false
         resetButton.titleLabel?.textAlignment = .center
         resetButton.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
         self.addSubview(resetButton)
+        //addTargets()
     }
-
+    /*
+    func addTargets() {
+        aboutButton.addTarget(self, action: #selector(ViewController.openAboutViewController), for: .touchUpInside)
+        preferencesButton.addTarget(self, action: #selector(ViewController.openPreferencesTableViewController), for: .touchUpInside)
+        shareButton.addTarget(self, action: #selector(ViewController.openShare), for: .touchUpInside)
+        folderButton.addTarget(self, action: #selector(ViewController.openFolderViewController), for: .touchUpInside)
+        trackerButton.addTarget(self, action: #selector(ViewController.trackerButtonTapped), for: .touchUpInside)
+        newPinButton.addTarget(self, action: #selector(ViewController.addPinAtMyLocation), for: .touchUpInside)
+        followUserButton.addTarget(self, action: #selector(ViewController.followButtonTroggler), for: .touchUpInside)
+        saveButton.addTarget(self, action: #selector(ViewController.saveButtonTapped), for: .touchUpInside)
+        resetButton.addTarget(self, action: #selector(ViewController.resetButtonTapped), for: .touchUpInside)
+    }
+ */
 }

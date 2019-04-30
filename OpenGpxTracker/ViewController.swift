@@ -381,8 +381,22 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
         self.view.addSubview(headerLayer)
         headerLayer.setupLayer(with: map, view: view, isIPhoneX: isIPhoneX)
         
-        map.addSubview(interactableLayer)
+        //map.addSubview(interactableLayer)
+        map.insertSubview(interactableLayer, at: 2)
         interactableLayer.setupLayer(with: map, view: view, isIPhoneX: isIPhoneX)
+        addTargets()
+    }
+    
+    func addTargets() {
+        interactableLayer.aboutButton.addTarget(self, action: #selector(openAboutViewController), for: .touchUpInside)
+        interactableLayer.preferencesButton.addTarget(self, action: #selector(openPreferencesTableViewController), for: .touchUpInside)
+        interactableLayer.shareButton.addTarget(self, action: #selector(openShare), for: .touchUpInside)
+        interactableLayer.folderButton.addTarget(self, action: #selector(openFolderViewController), for: .touchUpInside)
+        interactableLayer.trackerButton.addTarget(self, action: #selector(trackerButtonTapped), for: .touchUpInside)
+        interactableLayer.newPinButton.addTarget(self, action: #selector(addPinAtMyLocation), for: .touchUpInside)
+        interactableLayer.followUserButton.addTarget(self, action: #selector(followButtonTroggler), for: .touchUpInside)
+        interactableLayer.saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
+        interactableLayer.resetButton.addTarget(self, action: #selector(resetButtonTapped), for: .touchUpInside)
     }
     
     ///
