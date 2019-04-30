@@ -424,11 +424,121 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate  {
     }
     
     ///
+    /// Called when the application Becomes active (background -> foreground) this function verifies if
+    /// it has permissions to get the location.
+    ///
+    @objc func applicationDidBecomeActive() {
+        print("viewController:: applicationDidBecomeActive wasSentToBackground: \(wasSentToBackground) locationServices: \(CLLocationManager.locationServicesEnabled())")
+        
+        //If the app was never sent to background do nothing
+        if !wasSentToBackground {
+            return
+        }
+        checkLocationServicesStatus()
+        locationManager.startUpdatingLocation()
+        locationManager.startUpdatingHeading()
+    }
+    
+    ///
+    /// Actions to do in case the app entered in background
+    ///
+    /// In current implementation if the app is not tracking it requests the OS to stop
+    /// sharing the location to save battery.
+    ///
+    ///
+    @objc func didEnterBackground() {
+        wasSentToBackground = true // flag the application was sent to background
+        print("viewController:: didEnterBackground")
+        if gpxTrackingStatus != .tracking {
+            locationManager.stopUpdatingLocation()
+        }
+    }
+    
+    ///
+    /// Actions to do when the app will terminate
+    ///
+    /// In current implementation it removes all the temporary files that may have been created
+    @objc func applicationWillTerminate() {
+        print("viewController:: applicationWillTerminate")
+        GPXFileManager.removeTemporaryFiles()
+    }
+    
+    ///
+    /// Displays the view controller with the list of GPX Files.
+    ///
+    @objc func openFolderViewController() {
+        print("openFolderViewController")
+        let vc = GPXFilesTableViewController(nibName: nil, bundle: nil)
+        vc.delegate = self
+        let navController = UINavigationController(rootViewController: vc)
+        self.present(navController, animated: true) { () -> Void in }
+    }
+    
+    ///
+    /// Displays the view controller with the About information.
+    ///
+    @objc func openAboutViewController() {
+        let vc = AboutViewController(nibName: nil, bundle: nil)
+        let navController = UINavigationController(rootViewController: vc)
+        self.present(navController, animated: true) { () -> Void in }
+    }
+    
+    @objc func openPreferencesTableViewController() {
+        print("openPreferencesTableViewController")
+        let vc = PreferencesTableViewController(style: .grouped)
+        vc.delegate = self
+        let navController = UINavigationController(rootViewController: vc)
+        self.present(navController, animated: true) { () -> Void in }
+    }
+    
+    
+    /// Opens an Activity View Controller to share the file
+    @objc func openShare() {
+        print("share")
+        //Create a temporary file
+        let filename =  lastGpxFilename.isEmpty ? defaultFilename() : lastGpxFilename
+        let gpxString: String = self.map.exportToGPXString()
+        let tmpFile = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(filename).gpx")
+        GPXFileManager.saveToURL(tmpFile, gpxContents: gpxString)
+        //Add it to the list of tmpFiles.
+        //Note: it may add more than once the same file to the list.
+        
+        //Call Share activity View controller
+        let activityViewController = UIActivityViewController(activityItems: [tmpFile], applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = interactableLayer.shareButton
+        activityViewController.popoverPresentationController?.sourceRect = interactableLayer.shareButton.bounds
+        self.present(activityViewController, animated: true, completion: nil)
+    
+    }
+    
+    ///
+    /// After invoking this fuction, the map will not be centered on current user position.
+    ///
+    @objc func stopFollowingUser(_ gesture: UIPanGestureRecognizer) {
+        if self.followUser {
+            self.followUser = false
+        }
+    }
+    
+    ///
     /// UIGestureRecognizerDelegate required for stopFollowingUser
     ///
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
+    }
+   
+    ///
+    /// If user long presses the map for a while a Pin (Waypoint/Annotation) will be dropped at that point.
+    ///
+    @objc func addPinAtTappedLocation(_ gesture: UILongPressGestureRecognizer) {
+        if  gesture.state == UIGestureRecognizer.State.began {
+            print("Adding Pin map Long Press Gesture")
+            let point: CGPoint = gesture.location(in: self.map)
+            map.addWaypointAtViewPoint(point)
+            //Allows save and reset
+            self.hasWaypoints = true
+        }
     }
     
     // Zoom gesture controls that follow user to
