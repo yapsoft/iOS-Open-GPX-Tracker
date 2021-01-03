@@ -308,8 +308,7 @@ class GPXFilesTableViewController: UITableViewController, UINavigationBarDelegat
         // NOTE: As the activity view controller can be quite tall at times,
         //       the display of it may be offset automatically at times to ensure the activity view popup fits the screen.
         
-        activityViewController.completionWithItemsHandler = {
-            (activityType: UIActivity.ActivityType?, completed: Bool, returnedItems: [Any]?, error: Error?) in
+        activityViewController.completionWithItemsHandler = {(activityType: UIActivity.ActivityType?, completed: Bool, returnedItems: [Any]?, error: Error?) in
             if !completed {
                 // User canceled
                 print("actionShareAtIndex: Cancelled")

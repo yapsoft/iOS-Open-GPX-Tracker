@@ -38,13 +38,6 @@ class GPXExtentCoordinates: NSObject {
     
     /// This is the extent coordinates as a MKCoordinateRegion
     var region: MKCoordinateRegion {
-        set {
-            topLeftCoordinate.latitude = newValue.center.latitude - newValue.span.latitudeDelta/2
-            topLeftCoordinate.longitude = newValue.center.longitude + newValue.span.longitudeDelta/2
-            bottomRightCoordinate.latitude = newValue.center.latitude + newValue.span.latitudeDelta/2
-            bottomRightCoordinate.longitude = newValue.center.longitude - newValue.span.longitudeDelta/2
-        }
-        
         get {
             let centerLat = (bottomRightCoordinate.latitude + topLeftCoordinate.latitude) / 2
             let centerLon = (bottomRightCoordinate.longitude + topLeftCoordinate.longitude) / 2
@@ -55,5 +48,14 @@ class GPXExtentCoordinates: NSObject {
             
             return MKCoordinateRegion.init(center: center, span: span)
         }
+        
+        set {
+            topLeftCoordinate.latitude = newValue.center.latitude - newValue.span.latitudeDelta/2
+            topLeftCoordinate.longitude = newValue.center.longitude + newValue.span.longitudeDelta/2
+            bottomRightCoordinate.latitude = newValue.center.latitude + newValue.span.latitudeDelta/2
+            bottomRightCoordinate.longitude = newValue.center.longitude - newValue.span.longitudeDelta/2
+        }
+        
+       
     }
 }

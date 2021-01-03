@@ -47,33 +47,36 @@ extension GPXWaypoint: MKAnnotation {
     /// Title displayed on the annotation bubble.
     /// Is the attribute name of the waypoint.
     public var title: String? {
-        set {
-            self.name = newValue
-        }
         get {
             return self.name
         }
+        set {
+            self.name = newValue
+        }
+        
     }
     
     /// Subtitle displayed on the annotation bubble
     /// Description of the GPXWaypoint.
     public var subtitle: String? {
-        set {
-            self.desc = newValue
-        }
         get {
             return self.desc
         }
+        set {
+            self.desc = newValue
+        }
+        
     }
     
     ///Annotation coordinates. Returns/Sets the waypoint latitude and longitudes.
     public var coordinate: CLLocationCoordinate2D {
+        get {
+            return CLLocationCoordinate2D(latitude: self.latitude!, longitude: CLLocationDegrees(self.longitude!))
+        }
         set {
             self.latitude = newValue.latitude
             self.longitude = newValue.longitude
         }
-        get {
-            return CLLocationCoordinate2D(latitude: self.latitude!, longitude: CLLocationDegrees(self.longitude!))
-        }
+       
     }    
 }

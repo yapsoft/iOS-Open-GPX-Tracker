@@ -341,7 +341,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     ///
     deinit {
         print("*** deinit")
-        NotificationCenter.default.removeObserver(self)
     }
    
     /// Handles status bar color as a result from iOS 13 appearance changes
@@ -1067,7 +1066,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     ///
     @objc func resetButtonTapped() {
         
-        
         let sheet = UIAlertController(title: nil, message: NSLocalizedString("SELECT_OPTION", comment: "no comment"), preferredStyle: .actionSheet)
           
         let cancelOption = UIAlertAction(title: NSLocalizedString("CANCEL", comment: "no comment"), style: .cancel) { _ in
@@ -1082,12 +1080,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             self.gpxTrackingStatus = .notStarted
         }
         
-        
         sheet.addAction(cancelOption)
         sheet.addAction(saveAndStartOption)
         sheet.addAction(deleteOption)
         
-                
         self.present(sheet, animated: true) {
             print("Loaded actionSheet")
         }
