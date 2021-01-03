@@ -189,7 +189,6 @@ class DefaultNameSetupViewController: UITableViewController, UITextFieldDelegate
     func lockUTCCell(_ state: Bool) {
         let indexPath = IndexPath(row: 0, section: Sections.settings.rawValue)
         useUTC = state
-        
         tableView.cellForRow(at: indexPath)?.accessoryType = state ? .checkmark : .none
         tableView.cellForRow(at: indexPath)?.isUserInteractionEnabled = !state
         tableView.cellForRow(at: indexPath)?.textLabel?.isEnabled = !state
@@ -238,7 +237,6 @@ class DefaultNameSetupViewController: UITableViewController, UITextFieldDelegate
         
         if indexPath.section == Sections.input.rawValue {
             if indexPath.row == 0 {
-                
                 cellSampleLabel = UILabel(frame: CGRect(x: 87, y: 0, width: view.frame.width - 99, height: cell.frame.height))
                 cellSampleLabel.font = .boldSystemFont(ofSize: 17)
                 cell.addSubview(cellSampleLabel)
@@ -247,9 +245,7 @@ class DefaultNameSetupViewController: UITableViewController, UITextFieldDelegate
                 cellSampleLabel.adjustsFontSizeToFitWidth = true
                 cell.textLabel!.text = NSLocalizedString("DEFAULT_NAME_SAMPLE_OUTPUT_TITLE", comment: "no comment")
                 cell.textLabel?.font = .systemFont(ofSize: 17)
-                
             } else if indexPath.row == 1 {
-                
                 cellTextField = UITextField(frame: CGRect(x: 22, y: 0, width: view.frame.width - 48, height: cell.frame.height))
                 cellTextField.text = preferences.dateFormatInput
                 updateSampleTextField()
@@ -263,8 +259,8 @@ class DefaultNameSetupViewController: UITableViewController, UITextFieldDelegate
                 } else {
                     cellTextField.inputAccessoryView = createSimpleDateSelectionBar()
                 }
+                
                 cellTextField.addTarget(self, action: #selector(updateSampleTextField), for: UIControl.Event.editingChanged)
-
                 cell.contentView.addSubview(cellTextField)
             }
             cell.selectionStyle = .none
