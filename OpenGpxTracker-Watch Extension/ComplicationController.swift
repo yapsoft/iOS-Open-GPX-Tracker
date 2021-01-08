@@ -8,10 +8,36 @@
 
 import ClockKit
 
+let ComplicationDistanceIdentifier = "ComplicationTypeCondition"
+let ComplicationSpeedIdentifier="ComplicationTypeSpeed"
+
+///
 class ComplicationController: NSObject, CLKComplicationDataSource {
     
-    // MARK: - Timeline Configuration
     
+    /// Declares the list of supported complications
+    func getComplicationDescriptors(handler: @escaping ([CLKComplicationDescriptor]) -> Void) {
+        
+        // Families (how they look)
+        // https://developer.apple.com/design/human-interface-guidelines/watchos/overview/complications/
+        // Define complication descriptor
+        //https://developer.apple.com/documentation/clockkit/clkcomplicationdatasource/3555131-getcomplicationdescriptors
+        let supportedFamilies = CLKComplicationFamily.allCases
+        
+        // Create the descriptors
+        let distanceDescriptor = CLKComplicationDescriptor(
+            identifier: ComplicationDistanceIdentifier,
+            displayName: "Distance",
+            supportedFamilies: supportedFamilies)
+        
+        let speedDescriptor = CLKComplicationDescriptor(
+            identifier: ComplicationSpeedIdentifier,
+            displayName: "Speed",
+            supportedFamilies: supportedFamilies)
+        
+        handler([distanceDescriptor,speedDescriptor])
+    }
+    // MARK: - Timeline Configuration
     func getSupportedTimeTravelDirections(for complication: CLKComplication,
                                           withHandler handler: @escaping (CLKComplicationTimeTravelDirections) -> Void) {
         handler([.forward, .backward])
