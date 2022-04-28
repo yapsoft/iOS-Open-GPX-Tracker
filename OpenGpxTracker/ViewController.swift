@@ -1455,7 +1455,7 @@ extension ViewController: CLLocationManagerDelegate {
         print("mkMapcamera heading=\(map.camera.heading)")
         map.heading = newHeading // updates heading variable
         map.updateHeading() // updates heading view's rotation
-        
+        map.camera.heading = newHeading.magneticHeading
     }
     
     ///
