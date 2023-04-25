@@ -263,13 +263,22 @@ class InterfaceController: WKInterfaceController {
         }
         
     }
-    
+
     ///
     /// Save Button was tapped.
     ///
     /// Saves current track and waypoints as a GPX file, with a default filename of date and time.
     ///
-    @IBAction func saveButtonTapped(withReset: Bool = false) {
+    @IBAction func saveButtonTapped() {
+        saveAction();
+    }
+
+    ///
+    /// Save action.
+    ///
+    /// Saves current track and waypoints as a GPX file, with a default filename of date and time.
+    ///
+    func saveAction(withReset: Bool = false) {
         print("save Button tapped")
         // ignore the save button if there is nothing to save.
         if (gpxTrackingStatus == .notStarted) && !self.hasWaypoints {
@@ -302,7 +311,7 @@ class InterfaceController: WKInterfaceController {
         
         let cancelOption = WKAlertAction(title: NSLocalizedString("CANCEL", comment: "no comment"), style: .cancel) {}
         let saveAndStartOption = WKAlertAction(title: NSLocalizedString("SAVE_START_NEW", comment: "no comment"), style: .default) {
-            self.saveButtonTapped(withReset: true)
+            self.saveAction(withReset: true)
         }
         let deleteOption = WKAlertAction(title: NSLocalizedString("RESET", comment: "no comment"), style: .destructive) {
             self.gpxTrackingStatus = .notStarted
